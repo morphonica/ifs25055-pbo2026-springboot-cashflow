@@ -18,4 +18,4 @@ server:
 vaadin:
   launch-browser: false
   liveReload:
-    enabled: true
+    enabled: true 
