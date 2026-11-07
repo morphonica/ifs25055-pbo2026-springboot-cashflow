@@ -1,0 +1,21 @@
+target/
+.env
+node_modules/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.trivy-cache/
+trivy-results.sarif
+latest-app.zip
+app.jar
+# Vaadin generated
+/src/main/bundles/
+/src/main/frontend/generated/
+/vite.generated.ts
+/vite.config.ts
+/types.d.ts
+/tsconfig.json
+/package.json
+/package-lock.json
+/.vaadin/
