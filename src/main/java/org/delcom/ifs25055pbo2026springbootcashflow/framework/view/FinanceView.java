@@ -43,8 +43,10 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Cashflow - Catatan Keuangan")
 public class FinanceView extends VerticalLayout {
 
-    private static final String SUCCESS_COLOR = "var(--lumo-success-text-color)";
-    private static final String ERROR_COLOR = "var(--lumo-error-text-color)";
+    private static final String SUCCESS_COLOR = "#166534";
+    private static final String ERROR_COLOR = "#b91c1c";
+    private static final String SECONDARY_COLOR = "#4b5563";
+    private static final String WHITE = "#ffffff";
 
     private final FinanceUseCase useCase;
     private final FinancePresenter presenter;
@@ -63,6 +65,10 @@ public class FinanceView extends VerticalLayout {
         this.presenter = presenter;
 
         setSizeFull();
+        // Landmark utama + bahasa dokumen (aksesibilitas / Lighthouse)
+        getElement().setAttribute("role", "main");
+        addAttachListener(event -> event.getUI().getPage()
+                .executeJs("document.documentElement.lang = 'id';"));
         setPadding(true);
         setSpacing(true);
 
@@ -88,6 +94,8 @@ public class FinanceView extends VerticalLayout {
                 createCard("Total Pengeluaran", expenseValue),
                 createCard("Saldo Saat Ini", balanceValue));
         cards.setWidthFull();
+        cards.getElement().setAttribute("role", "group");
+        cards.getElement().setAttribute("aria-label", "Ringkasan keuangan");
         cards.getStyle().set("flex-wrap", "wrap");
         return cards;
     }
@@ -95,10 +103,10 @@ public class FinanceView extends VerticalLayout {
     private Div createCard(String title, Span value) {
         Span titleSpan = new Span(title);
         titleSpan.getStyle()
-                .set("font-size", "var(--lumo-font-size-s)")
-                .set("color", "var(--lumo-secondary-text-color)");
+                .set("font-size", "var(--lumo-font-size-s, 0.875rem)")
+                .set("color", SECONDARY_COLOR);
         value.getStyle()
-                .set("font-size", "var(--lumo-font-size-xl)")
+                .set("font-size", "var(--lumo-font-size-xl, 1.5rem)")
                 .set("font-weight", "600");
 
         Div card = new Div(titleSpan, value);
@@ -106,20 +114,22 @@ public class FinanceView extends VerticalLayout {
                 .set("display", "flex")
                 .set("flex-direction", "column")
                 .set("flex", "1 1 200px")
-                .set("padding", "var(--lumo-space-m)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("background", "var(--lumo-contrast-5pct)");
+                .set("padding", "var(--lumo-space-m, 1rem)")
+                .set("border-radius", "var(--lumo-border-radius-l, 0.5rem)")
+                .set("background", "var(--lumo-contrast-5pct, #f3f4f6)");
         return card;
     }
 
     private HorizontalLayout createToolbar() {
         searchField.setPlaceholder("Cari keterangan...");
+        searchField.setAriaLabel("Cari keterangan transaksi");
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setClearButtonVisible(true);
         searchField.setValueChangeMode(ValueChangeMode.LAZY);
         searchField.addValueChangeListener(event -> refresh());
 
         sortSelect.setPlaceholder("Urutkan...");
+        sortSelect.setAriaLabel("Urutkan transaksi");
         sortSelect.setItems(SortOption.values());
         sortSelect.setItemLabelGenerator(SortOption::getLabel);
         sortSelect.setClearButtonVisible(true);
@@ -130,10 +140,12 @@ public class FinanceView extends VerticalLayout {
         Button addIncome = new Button("Tambah Pemasukan", VaadinIcon.PLUS.create(),
                 event -> openAddDialog(TransactionType.INCOME));
         addIncome.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
+        addIncome.getStyle().set("background", SUCCESS_COLOR).set("color", WHITE);
 
         Button addExpense = new Button("Tambah Pengeluaran", VaadinIcon.MINUS.create(),
                 event -> openAddDialog(TransactionType.EXPENSE));
         addExpense.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        addExpense.getStyle().set("background", ERROR_COLOR).set("color", WHITE);
 
         HorizontalLayout toolbar = new HorizontalLayout(searchField, sortSelect, reload, addIncome, addExpense);
         toolbar.setWidthFull();
@@ -144,6 +156,7 @@ public class FinanceView extends VerticalLayout {
 
     private void configureGrid() {
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        grid.getElement().setAttribute("aria-label", "Daftar transaksi");
 
         grid.addColumn(Transaction::getId)
                 .setHeader("ID")

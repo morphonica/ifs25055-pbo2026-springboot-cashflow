@@ -8,7 +8,9 @@ server:
     context-path: /
   forward-headers-strategy: framework
   compression:
-    enabled: false
+    enabled: true
+    min-response-size: 512
+    mime-types: text/html,text/css,text/plain,application/javascript,text/javascript,application/json,image/svg+xml
   tomcat:
     internal-proxies: .*
     remote-ip-header: x-forwarded-for
